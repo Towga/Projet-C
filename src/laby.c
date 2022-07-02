@@ -3,9 +3,11 @@
 #include <time.h>
 #include <ncurses.h>
 
-
-
-
+void  Exit_With_Error(const char    *message)
+{
+    printf("Erreur: %s \n", message);
+    exit(EXIT_FAILURE);
+}
 /* Associe une valeur à width et height en fonction du niveau*/
 void argument(int arg, int * width, int * height) {
 
@@ -81,6 +83,12 @@ int is_valid(int x, int y, int height, int width, char maze[]) {
       return 1;
     }
 }
+int is_valid_edit(int x, int y, int height, int width, char laby[])
+{
+    if ((y > height - 2)||(x > width - 2)||(y < 1)|| (x <1 ))return 0;
+    
+    return 1;
+}
 
 /* is_finish vérifie que l'emplacement sur lequel se trouve les coordonnées (x, y) est une sortie */
 int is_finish(int x, int y, int height, int width, char maze[]) {
@@ -90,8 +98,12 @@ int is_finish(int x, int y, int height, int width, char maze[]) {
     return 0;
   }
 }
-
-
+int is_finish_edit(int x, int y, int height, int width, char laby[]) {
+   
+   if(laby[(y+1) * width + x] == 'x') return 1;
+   
+   return 0;
+  }
 /*  Carve the maze starting at x, y. */
 void CarveMaze(char *maze, int width, int height, int x, int y) {
 
@@ -157,6 +169,21 @@ void GenerateMaze(char *maze, int width, int height) {
     maze[(height - 1) * width + (width - 2)] = 4;
 
 }
+/*genere une map remplie de 1*/
+void  GenerateMaze_edit(char *maze, int width, int height) {
+
+   int x, y;
+
+   /* Initialize the maze. */
+   for(x = 0; x < width * height; x++) {
+      maze[x] = 1;
+   }
+
+   /* Set up the entry and exit. */
+    maze[width + 1] = 3;
+    maze[(height - 1) * width + (width - 2)] = 4;
+
+}
 
 /* Solve the maze. */
 void SolveMaze(char *maze, int width, int height) {
@@ -208,9 +235,7 @@ void SolveMaze(char *maze, int width, int height) {
 }
 
 /* Moove into maze */
-void moove(char * maze,int width,int height){
-  char *maze_change;
-  maze_change = change_grille(maze,width,height);
+void moove(char * maze,int width,int height,char *maze_change){
   int x = 1, y = 1;
   int move_x, move_y;
   initscr();
@@ -235,10 +260,46 @@ void moove(char * maze,int width,int height){
     if(is_valid(move_x, move_y, height, width,maze)) {
     x = move_x; y = move_y;
     }
-
-
   } while(! is_finish(x, y, height, width, maze));
 
   refresh();
   endwin();
 }
+/* Moove into maze */
+char* moove_edit(char * maze,int width,int height, char *maze_change){
+ 
+  int x = 1, y = 1;
+  int move_x, move_y;
+  initscr();
+  noecho();
+  cbreak();
+  do {
+    clear();
+    afficher_grille(maze_change, width, height);
+
+
+    printf("\033[0;31m");
+    mvprintw(y, x, "@");
+    mvprintw(y, x, "");
+    refresh();
+    move_x = x; move_y = y;
+    switch(getch()) {
+      case 'z': move_y = y - 1; break;
+      case 's': move_y = y + 1; break;
+      case 'q': move_x = x - 1; break;
+      case 'd': move_x = x + 1; break;
+    }
+    if(is_valid_edit(move_x, move_y, height, width,maze))
+    {
+      x = move_x; y = move_y;
+      maze[move_x + move_y * width] = 0;
+    }
+  } while(! is_finish_edit(x, y, height, width, maze));
+
+  refresh();
+  endwin();
+  return (maze);
+}
+
+
+

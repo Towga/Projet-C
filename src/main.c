@@ -5,11 +5,15 @@
 #include "laby.h"
 
 
-int main(int argc,char *argv[]) {
+int main(int argc,char *argv[]){
 
     printf("\033[0;31m");
 
     int choix=1;
+    int width = 9;
+		int height = 9;
+    char  *maze;
+    char *maze_change;
 
     while (choix != 0)
     {
@@ -18,7 +22,7 @@ int main(int argc,char *argv[]) {
     printf("		********************** Welcome! *********************\n");
     printf("		*                     MAZE GAME                     *\n");
     printf("		*  1.Enter Game                                     *\n");
-    printf("		*  2.Settings                                       *\n");
+    printf("		*  2.editor                                       *\n");
     printf("		*  3.Quit                                           *\n");
     printf("		*                                                   *\n");
     printf("		*****************************************************\n");
@@ -32,53 +36,28 @@ int main(int argc,char *argv[]) {
     switch (choix){
       case 1:
         printf("Enter Game:\n");
-
-
-        // printf("\e[?25l");
-
-         int width = 9;
-				 int height = 9;
-         char *maze;
-
-
 				 /*S'assure qu'on donne bien le niveau du labyrinthe voulu et si voulu la solution avec*/
-				 if(argc != 2 && argc != 3) {
-			      printf("Usage: maze <level> [s]\n");
-			      exit(EXIT_FAILURE);
-			   }
-
-				 if(argc == 3 && argv[2][0] != 's') {
-						printf("error: invalid argument\n");
-						exit(EXIT_FAILURE);
-				 }
+				 if(argc != 2 && argc != 3) Exit_With_Error("Usage: maze <level> [s]\n");
+				 
+         if(argc == 3 && argv[2][0] != 's') Exit_With_Error("invalid argument\n");
 
 				 /*Associe une valeur à width et height en fonction du niveau*/
 				 argument(atoi(argv[1]),&width,&height);
 
-
-
-
-
          /* Allocate the maze array. */
          maze = (char *)malloc(width * height * sizeof(char));
-         if(maze == NULL) {
-            printf("error: not enough memory\n");
-            exit(EXIT_FAILURE);
-         }
+         
+         if(maze == NULL) Exit_With_Error("not enough memory\n");
 
          /* Generate and display the maze. */
          GenerateMaze(maze, width, height);
+         maze_change = change_grille(maze,width,height);
          // ShowMaze(maze, width, height);
 
-
-
-
          /* Resolve le labyrinthe si demandé */
-         if(argc == 3) {
-            SolveMaze(maze, width, height);
-         }
+         if(argc == 2) SolveMaze(maze, width, height);
 
-         moove(maze,width,height);
+         moove(maze,width,height,maze_change);
 
 				 printf("\033[0;32m");
 				 printf("		Bien jouer ! Voulez vous passer au niveau suivant ?\n");
@@ -90,9 +69,22 @@ int main(int argc,char *argv[]) {
 
         choix = 0;
       break;
-      case 2:
-        printf("Enter Settings:\n");
-        choix = 0;
+        case 2:
+          printf("Enter editor:\n");
+          maze = (char *)malloc(width * height * sizeof(char));
+         
+         if(maze == NULL) Exit_With_Error("not enough memory\n");
+
+         /* Generate and display the maze. */
+         GenerateMaze_edit(maze, width, height);
+          maze_change = change_grille(maze,width,height);
+        /* Resolve le labyrinthe si demandé */
+        //  if(argc == 2) SolveMaze(maze, width, height);
+        maze = moove_edit(maze_change,width,height,maze_change);
+
+        moove(maze,width,height,maze_change);
+
+          choix = 0;
       break;
       case 3:
         printf("You quit !\n");
