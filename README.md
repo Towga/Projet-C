@@ -7,3 +7,5 @@
   le program ne prend pas d'argument vous pouvez jouer 5 nvx a difficulté montante qui se genere automatiquement
 
   vous pouvez aussi edit une map en 9*9 et jouer dedans tt de suite après
+  
+  voici notre GIT :https://github.com/Towga/Projet-C/edit/master/README.md
