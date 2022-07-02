@@ -8,4 +8,4 @@
 
   vous pouvez aussi edit une map en 9*9 et jouer dedans tt de suite après
   
-  voici notre GIT :https://github.com/Towga/Projet-C/edit/master/README.md
+  voici notre GIT :https://github.com/Towga/Projet-C/
